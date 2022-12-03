@@ -1,5 +1,5 @@
-const solve = (input) => {
-    console.log(input);
+const solve = (initialInput) => {
+    console.log(initialInput);
 }
 
 export default solve;
