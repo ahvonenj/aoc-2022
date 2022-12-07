@@ -10,49 +10,48 @@ class FileSystem {
         this.currentDirectory = this.root;
     }
 
-    // Windows-style directory- and file tree printing function
-    Tree() {
-        
+    getTotalSize() {
+        let dirs = [];
+        const _getTotalSize = (directory) => {
+            let totalSize = directory.files.reduce((acc, file) => acc + file.size, 0);
+            directory.directories.forEach((directory) => totalSize += _getTotalSize(directory));
+            //console.log(`directory: ${directory.name}, totalSize: ${totalSize}`)
+            dirs.push({
+                directory: directory.name,
+                totalSize: totalSize
+            })
+            return totalSize;
+        }
+
+        _getTotalSize(this.root);
+
+        let fileSystemSize = 70000000;
+        let usedSpace = dirs.find(d => d.directory === '/').totalSize;
+        let currentSpace = fileSystemSize - usedSpace;
+        let updateSpaceNeeded = 30000000;
+        let spaceToFind = updateSpaceNeeded - currentSpace;
+
+        console.log(fileSystemSize, currentSpace, spaceToFind);
+
+        let potentialDirs = dirs.filter((d) => d.totalSize >= spaceToFind && d.directory !== '/');
+        let correctDir = Math.min(...potentialDirs.map((d) => d.totalSize));
+        console.table(potentialDirs);
+        console.log(correctDir, Math.abs(spaceToFind - correctDir));
     }
 
     printFileTree() {
-        const printFileTree = (directory, depth) => {
-            // '└'
-            let dirRepeat;
-            if(depth === 0)
-                dirRepeat = 0;
-            else if(depth === 1)
-                dirRepeat = 0;
-            else
-                dirRepeat = (depth - 1);
+        const _printFileTree = (directory, depth) => {
+            console.log(`${' '.repeat(depth * 4)} - ${directory.name} (dir)`);
 
-            let fileRepeat;
-            if(depth === 0)
-                fileRepeat = 0;
-            else if(depth === 1)
-                fileRepeat = 1;
-            else
-                fileRepeat = (depth - 1);
+            let thisDirSize = directory.files.reduce((acc, file) => acc + file.size, 0);
 
-            const dirIndent = depth === 0 ? '' : '│' + '   │'.repeat(dirRepeat) + '─'.repeat(4)
-            const fileIndent = '│' + '   │'.repeat(fileRepeat) + ' '.repeat(8);
-            const clearIndent = '│' + '   │'.repeat(fileRepeat) + ' '.repeat(8);
-            const clearIndent2 = '│' + '   │'.repeat(fileRepeat + 1) + ' '.repeat(8);
+            directory.files.forEach((file) => console.log(`${' '.repeat((depth + 1) * 4)} - ${file.name} (file, size=${file.size})`));
+            directory.directories.forEach((directory, i) => thisDirSize += _printFileTree(directory, depth + 1));
+            console.log(`${' '.repeat(depth * 4)} ${thisDirSize} (total)`);
+            return thisDirSize;
+        };
 
-            console.log(`${dirIndent}${directory.name === '/' ? 'root' : directory.name} dep: ${depth}`);
-
-            directory.files.forEach((file) => console.log(fileIndent + file.name));
-
-            if(directory.files.length === 0)
-                console.log(clearIndent2);
-            else
-                console.log(clearIndent);
-
-            directory.directories.forEach((directory, i) => printFileTree(directory, depth + 1));
-            console.log(clearIndent);
-        }
-
-        printFileTree(this.root, 0);
+        _printFileTree(this.root, 0);
     }
 }
 

@@ -60,12 +60,13 @@ const solve = (initialInput) => {
             fileSystem.currentDirectory.directories.push(new Directory(trace.out2, fileSystem.currentDirectory));
         }
         else {
-            fileSystem.currentDirectory.files.push(new File(trace.out2, trace.out1));
+            fileSystem.currentDirectory.files.push(new File(trace.out2, parseInt(trace.out1)));
         }
 
     });
 
     fileSystem.printFileTree();
+    fileSystem.getTotalSize();
 }
 
 export default solve;

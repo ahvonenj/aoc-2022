@@ -3,6 +3,7 @@ class Directory {
     files;
     directories;
     parent;
+    dir
 
     constructor(name, parent) {
         this.name = name;
